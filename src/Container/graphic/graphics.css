@@ -1,0 +1,48 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+body {
+    background: #ecf1f5;
+}
+.graphic {
+    height: 690px;
+}
+.graphics-panel {
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+}
+.graphic-buttons {
+    display: flex;
+    align-items: center;
+    margin-bottom: 100px;
+    margin-top: 25px;
+}
+.button-lapse-time {
+    padding: 5px 15px;
+    background: cadetblue;
+    color: white;
+    border-color: #38bec7;
+    cursor: pointer;
+    margin-left: 25px;
+}
+.bar-and-pie-graph {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+.bar-chart {
+    width: 45%;
+    height: 400px;
+}
+.bar-chart-inner {
+    height: 680px;
+}
+.pie-chart {
+    width: 45%;
+}
+.pie-chart-inner {
+    height: 400px;
+}
