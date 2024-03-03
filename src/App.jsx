@@ -1,10 +1,11 @@
 import './App.css';
-import BarChart from './Container/graphic/graphic';
+import BarChartAndPie from './Container/graphic/barChartAndPie';
 
-function App() {
+
+const App = () => {
   return (
     <div className="App">
-      <BarChart />
+      <BarChartAndPie />
     </div>
   );
 }
