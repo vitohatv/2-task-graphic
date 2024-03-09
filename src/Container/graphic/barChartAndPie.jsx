@@ -4,13 +4,13 @@ import './graphics.css';
 import { ResponsivePie } from '@nivo/pie';
 
 const data = [
-  { resolver: 'Resolver1', profit: 0.0083, time: '2024-03-03 11:51:11.000 UTC' },
-  { resolver: 'Resolver2', profit: 0.0053, time: '2024-03-03 10:51:11.000 UTC' },
-  { resolver: 'Resolver3', profit: 0.0023, time: '2024-03-02 13:51:11.000 UTC' },
-  { resolver: 'Resolver4', profit: -0.0031, time: '2024-02-28 16:51:11.000 UTC' },
-  { resolver: 'Resolver1', profit: 0.0087, time: '2024-02-25 10:51:11.000 UTC' },
-  { resolver: 'Resolver2', profit: 0.0032, time: '2024-03-03 11:51:11.000 UTC' },
-  { resolver: 'Resolver3', profit: 0.0012, time: '2024-02-29 10:51:11.000 UTC' },
+  { resolver: 'Resolver1', profit: 0.0083, time: '2024-03-09 21:51:11.000 UTC' },
+  { resolver: 'Resolver2', profit: 0.0053, time: '2024-03-09 8:59:34.000 UTC' },
+  { resolver: 'Resolver3', profit: 0.0023, time: '2024-03-08 19:59:29.000 UTC' },
+  { resolver: 'Resolver4', profit: -0.0031, time: '2024-03-07 16:58:11.000 UTC' },
+  { resolver: 'Resolver1', profit: 0.0087, time: '2024-03-06 10:51:11.000 UTC' },
+  { resolver: 'Resolver2', profit: 0.0032, time: '2024-03-05 11:51:11.000 UTC' },
+  { resolver: 'Resolver3', profit: 0.0012, time: '2024-03-05 10:51:11.000 UTC' },
   { resolver: 'Resolver4', profit: -0.0001, time: '2024-02-25 10:51:11.000 UTC' },
   { resolver: 'Resolver1', profit: 0.0031, time: '2024-02-21 09:51:11.000 UTC' },
   { resolver: 'Resolver2', profit: 0.0021, time: '2024-02-23 09:51:11.000 UTC' },
@@ -42,28 +42,34 @@ const BarChartAndPie = () => {
         return diffHours <= maxHours;
     });
 
-    const resolverCounts = {};
+    const groupedData = {};
 
     filteredData.forEach(item => {
-        const time = new Date(item.time);
-        let timeKey;
-        if (selectedTime === '1h' || selectedTime === '4h' || selectedTime === '8h' || selectedTime === '24h') {
-            const hour = `${time.getHours()}:${time.getMinutes()}`;
-            timeKey = `${hour} ${item.resolver}`;
-        } else {
-            timeKey = `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()} ${item.resolver}`;
-        }
-        resolverCounts[timeKey] = (resolverCounts[timeKey] || 0) + 1;
+        const { resolver, profit, time } = item;
+        const daysAgo = Math.ceil((Date.now() - new Date(time)) / (1000 * 60 * 60 * 24));
+        const intervalStart = Math.floor((daysAgo - 1) / 4) * 4 + 1;
+        const intervalEnd = Math.min(intervalStart + 3, daysAgo);
+        const intervalLabel = `${intervalStart}-${intervalEnd} Days`;
+    
+        groupedData[intervalLabel] = groupedData[intervalLabel] || {};
+        groupedData[intervalLabel][resolver] = (groupedData[intervalLabel][resolver] || 0) + profit;
     });
 
-    const barChartData = Object.entries(resolverCounts).map((
-        [time, count]) => ({ time, count }
-    ));
+    const barChartData = Object.entries(groupedData).map(([time, resolvers]) => ({ time, ...resolvers }));
 
-    const pieChartData = Object.entries(resolverCounts)
-    .filter(([time, count]) => count > 0)
-    .map(([time, count]) => ({ id: time, label: time, value: count }
-    ));
+    const resolverProfits = {};
+    
+    filteredData.forEach(item => {
+        const resolver = item.resolver;
+        const profit = item.profit;
+        resolverProfits[resolver] = (resolverProfits[resolver] || 0) + profit;
+    });
+    
+    const pieChartData = Object.entries(resolverProfits).map(([resolver, profit]) => ({
+        id: resolver,
+        label: resolver,
+        value: profit.toFixed(4)
+    }));
 
   return (
       <div className='graphics-panel'>
@@ -83,13 +89,13 @@ const BarChartAndPie = () => {
                   <div className='bar-chart-inner'>
                     <ResponsiveBar
                         data={barChartData}
-                        keys={['count']}
+                        keys={['Resolver1', 'Resolver2', 'Resolver3', 'Resolver4']}
                         indexBy="time"
                         margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
                         padding={0.19} 
                         layout="horizontal"
                         groupMode="stacked"
-                        colors={{ scheme: 'set2' }}
+                        colors={{ scheme: 'set3' }}
                         labelSkipWidth={12}
                         labelSkipHeight={12}
                         axisRight={{
