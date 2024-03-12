@@ -4,17 +4,17 @@ import './graphics.css';
 import { ResponsivePie } from '@nivo/pie';
 
 const data = [
-  { resolver: 'Resolver1', profit: 0.0083, time: '2024-03-09 21:51:11.000 UTC' },
-  { resolver: 'Resolver2', profit: 0.0053, time: '2024-03-09 8:59:34.000 UTC' },
-  { resolver: 'Resolver3', profit: 0.0023, time: '2024-03-08 19:59:29.000 UTC' },
-  { resolver: 'Resolver4', profit: -0.0031, time: '2024-03-07 16:58:11.000 UTC' },
+  { resolver: 'Resolver1', profit: 0.0083, time: '2024-03-12 21:51:11.000 UTC' },
+  { resolver: 'Resolver2', profit: 0.0053, time: '2024-03-12 8:59:34.000 UTC' },
+  { resolver: 'Resolver3', profit: 0.0023, time: '2024-03-10 19:59:29.000 UTC' },
+  { resolver: 'Resolver4', profit: -0.0031, time: '2024-03-10 16:58:11.000 UTC' },
   { resolver: 'Resolver1', profit: 0.0087, time: '2024-03-06 10:51:11.000 UTC' },
   { resolver: 'Resolver2', profit: 0.0032, time: '2024-03-05 11:51:11.000 UTC' },
   { resolver: 'Resolver3', profit: 0.0012, time: '2024-03-05 10:51:11.000 UTC' },
   { resolver: 'Resolver4', profit: -0.0001, time: '2024-02-25 10:51:11.000 UTC' },
-  { resolver: 'Resolver1', profit: 0.0031, time: '2024-02-21 09:51:11.000 UTC' },
-  { resolver: 'Resolver2', profit: 0.0021, time: '2024-02-23 09:51:11.000 UTC' },
-  { resolver: 'Resolver3', profit: 0.0037, time: '2024-02-25 09:51:11.000 UTC' },
+  { resolver: 'Resolver1', profit: 0.0031, time: '2024-02-23 09:51:11.000 UTC' },
+  { resolver: 'Resolver2', profit: 0.0021, time: '2024-02-21 09:51:11.000 UTC' },
+  { resolver: 'Resolver3', profit: 0.0037, time: '2024-02-21 09:51:11.000 UTC' },
   { resolver: 'Resolver4', profit: 0.0024, time: '2024-02-20 09:51:11.000 UTC' },
   { resolver: 'Resolver4', profit: 0.0024, time: '2024-02-20 09:51:11.000 UTC' }
 ];
@@ -45,18 +45,25 @@ const BarChartAndPie = () => {
     const groupedData = {};
 
     filteredData.forEach(item => {
-        const { resolver, profit, time } = item;
-        const daysAgo = Math.ceil((Date.now() - new Date(time)) / (1000 * 60 * 60 * 24));
-        const intervalStart = Math.floor((daysAgo - 1) / 4) * 4 + 1;
+        const time = new Date(item.time);
+        const daysAgo = Math.ceil((Date.now() - time) / (1000 * 60 * 60 * 24));
+        const intervalIndex = Math.floor((daysAgo - 1) / 4);
+        const intervalStart = intervalIndex * 4 + 1;
         const intervalEnd = Math.min(intervalStart + 3, daysAgo);
         const intervalLabel = `${intervalStart}-${intervalEnd} Days`;
-    
-        groupedData[intervalLabel] = groupedData[intervalLabel] || {};
-        groupedData[intervalLabel][resolver] = (groupedData[intervalLabel][resolver] || 0) + profit;
+        if (!groupedData[intervalLabel]) {
+            groupedData[intervalLabel] = {};
+        }
+        if (!groupedData[intervalLabel][item.resolver]) {
+            groupedData[intervalLabel][item.resolver] = 0;
+        }
+        groupedData[intervalLabel][item.resolver]++;
     });
 
-    const barChartData = Object.entries(groupedData).map(([time, resolvers]) => ({ time, ...resolvers }));
-
+    const barChartData = Object.entries(groupedData).map(([timeInterval, resolvers]) => ({
+        time: timeInterval,
+        ...resolvers
+    }));
     const resolverProfits = {};
     
     filteredData.forEach(item => {
@@ -109,7 +116,6 @@ const BarChartAndPie = () => {
                             tickSize: 5,
                             tickPadding: 5,
                             tickRotation: 0,
-                            legend: 'Time',
                             legendPosition: 'middle',
                             legendOffset: 36
                         }}
